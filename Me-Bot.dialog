@@ -1,0 +1,138 @@
+{
+  "$kind": "Microsoft.AdaptiveDialog",
+  "$designer": {
+    "id": "433224",
+    "description": "ME experience using a bot instead of teams tab",
+    "name": "Me-Bot"
+  },
+  "autoEndDialog": true,
+  "defaultResultProperty": "dialog.result",
+  "triggers": [
+    {
+      "$kind": "Microsoft.OnUnknownIntent",
+      "$designer": {
+        "id": "821845"
+      },
+      "actions": [
+        {
+          "$kind": "Microsoft.SendActivity",
+          "$designer": {
+            "id": "003038"
+          },
+          "activity": "${SendActivity_003038()}"
+        }
+      ]
+    },
+    {
+      "$kind": "Microsoft.OnConversationUpdateActivity",
+      "$designer": {
+        "id": "376720"
+      },
+      "actions": [
+        {
+          "$kind": "Microsoft.Foreach",
+          "$designer": {
+            "id": "518944",
+            "name": "Loop: for each item"
+          },
+          "itemsProperty": "turn.Activity.membersAdded",
+          "actions": [
+            {
+              "$kind": "Microsoft.IfCondition",
+              "$designer": {
+                "id": "641773",
+                "name": "Branch: if/else"
+              },
+              "condition": "string(dialog.foreach.value.id) != string(turn.Activity.Recipient.id)",
+              "actions": [
+                {
+                  "$kind": "Microsoft.SendActivity",
+                  "$designer": {
+                    "id": "859266",
+                    "name": "Send a response"
+                  },
+                  "activity": "${SendActivity_Welcome()}"
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "$kind": "Microsoft.OnIntent",
+      "$designer": {
+        "id": "Rmz3s8",
+        "name": "MyMeetings"
+      },
+      "intent": "MyMeetings",
+      "actions": [
+        {
+          "$kind": "Microsoft.OAuthInput",
+          "$designer": {
+            "id": "2RZJjm"
+          },
+          "timeout": 900000,
+          "maxTurnCount": 3,
+          "allowInterruptions": true,
+          "connectionName": "graph-connection",
+          "text": "Please sign in",
+          "title": "Login",
+          "property": "dialog.auth",
+          "invalidPrompt": "${OAuthInput_InvalidPrompt_2RZJjm()}"
+        },
+        {
+          "$kind": "Microsoft.HttpRequest",
+          "$designer": {
+            "id": "69QtPT"
+          },
+          "method": "GET",
+          "url": "https://graph.microsoft.com/v1.0/me/calendar/events?$filter=Start/DateTime ge '${utcNow()}'&$orderby= Start/DateTime asc",
+          "headers": {
+            "Authorization": "Bearer ${dialog.auth.token}",
+            "Prefer": "outlook.timezone=\"E. Australia Standard Time\""
+          },
+          "resultProperty": "dialog.meeting",
+          "contentType": "application/json",
+          "responseType": "json"
+        },
+        {
+          "$kind": "Microsoft.IfCondition",
+          "$designer": {
+            "id": "JH18xn"
+          },
+          "condition": "=count(dialog.meeting.content.value)>0",
+          "elseActions": [
+            {
+              "$kind": "Microsoft.SendActivity",
+              "$designer": {
+                "id": "lWO9WG"
+              },
+              "activity": "${SendActivity_lWO9WG()}"
+            }
+          ],
+          "actions": [
+            {
+              "$kind": "Microsoft.SendActivity",
+              "$designer": {
+                "id": "CIVkNA"
+              },
+              "activity": "${SendActivity_CIVkNA()}"
+            },
+            {
+              "$kind": "Microsoft.SendActivity",
+              "$designer": {
+                "id": "iTB1Q8"
+              },
+              "activity": "${SendActivity_iTB1Q8()}"
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "generator": "Me-Bot.lg",
+  "$schema": "https://raw.githubusercontent.com/microsoft/BotFramework-Composer/stable/Composer/packages/server/schemas/sdk.schema",
+  "id": "Me-Bot",
+  "recognizer": "Me-Bot.lu.qna"
+}

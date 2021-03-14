@@ -1,0 +1,8 @@
+{
+  "Me-Bot.en-us": {
+    "rootDialog": true,
+    "triggers": {
+      "MyMeetings": []
+    }
+  }
+}

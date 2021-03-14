@@ -1,0 +1,131 @@
+[import](common.lg)
+
+# SendActivity_Welcome
+- ${WelcomeUser()}
+
+# SendActivity_003038
+- You said '${turn.activity.text}'
+
+# OAuthInput_InvalidPrompt_2RZJjm()
+- Sorry auth does not like it
+# SendActivity_lWO9WG()
+- Looks like it's quiet in here 😀 Time to focus on work!
+# SendActivity_CIVkNA()
+- Here is a list of meetings for you 👀
+
+# MeetingAdaptiveCard(response)
+[Activity  
+ Attachments = ${json(genMeetingAdaptiveCard(response))}
+ ]
+# genMeetingAdaptiveCard(data)
+-``` 
+{
+    "type": "AdaptiveCard",
+    "body": [
+           {
+                    "type": "ColumnSet",
+                    "style": "emphasis",
+                    "columns": [
+                        {
+                            "type": "Column",
+                            "items": [
+                                {
+                                    "type": "TextBlock",
+                                    "text": "Upcoming meetings",
+                                    "wrap": true
+                                }
+                            ],
+                            "width": "stretch",
+                            "padding": "None"
+                        }
+                       
+                    ],
+                    "padding": "Default",
+                    "spacing": "None"
+                },
+        {
+            "type": "Container",
+            "items": [ ${join(foreach(data, value, genMeetingAdaptiveCardItems(value)), ',')}  ]
+        }
+    ],
+    "$schema": "http://adaptivecards.io/schemas/adaptive-card.json",
+    "version": "1.2"
+}
+```
+# genMeetingAdaptiveCardItems(item)
+-``` 
+ {
+      "type": "ColumnSet",
+      "columns": [
+ {
+          "type": "Column",
+          "items": [
+            {
+              "type": "TextBlock",
+              "text": "**${item.subject}**",
+              "wrap": true
+            },
+           
+{
+    "type": "ColumnSet",
+    "columns": [    
+     
+        {
+            "type": "Column",
+             "width": "stretch",
+                "spacing": "Small",
+                "padding": "None",              
+            "items": [
+               
+                {
+                    "type": "FactSet",
+                    "id":"${item.id}",
+                    "facts": [                      
+                        {
+                            "title":"From",
+                            "value": "${formatDateTime(item.start.dateTime ,"dd/MM/yyyy hh:mm tt")}"
+                        },
+                        {
+                            "title":"To",
+                           "value": "${formatDateTime(item.end.dateTime ,"dd/MM/yyyy hh:mm tt")}"
+                        }
+                       
+                    ]
+                }
+            ],
+            "padding": {
+                "top": "Default",
+                "bottom": "None",
+                "left": "Default",
+                "right": "Default"
+            },
+            "spacing": "None"
+        },
+        {
+            "type": "Column",
+            "width": "auto",
+            "items": [
+                {
+                    "type": "ActionSet",
+                    "actions": [
+                        {
+                            "type": "Action.OpenUrl",
+                            "title": "Go to meeting",
+                            "style": "positive",
+                            "url": "${item.webLink}"
+                        }
+                    ],
+                    "horizontalAlignment": "Right"
+                }
+                
+            ]
+        }
+    ]
+} 
+  ],
+          "width": 40
+        }]}
+
+```
+# SendActivity_iTB1Q8()
+- ${MeetingAdaptiveCard(dialog.meeting.content.value)}
